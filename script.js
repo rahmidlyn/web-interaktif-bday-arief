@@ -22,7 +22,7 @@ class Component extends DCLogic {
     this._d = {
       stages: [
         { id: 'intro', num: '00', name: 'PERKENALAN PEMAIN', tod: 'pagi', say: 'Perkenalan pemain' },
-        { id: 'quiz', num: '01', name: 'QUIZ KEPRIBADIAN', tod: 'pagi', say: 'Quiz kepribadian' },
+        { id: 'quiz', num: '01', name: 'KUIS KEPRIBADIAN', tod: 'pagi', say: 'Quiz kepribadian' },
         { id: 'rush', num: '02', name: 'MORNING RUSH', tod: 'pagi', say: 'Morning Rush' },
         { id: 'memory', num: '03', name: 'KARTU MEMORI', tod: 'pagi', say: 'Kartu memori' },
         { id: 'bugs', num: '04', name: 'WHACK-A-BUG', tod: 'siang', say: 'Whack a bug' },
