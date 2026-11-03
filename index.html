@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17152F">
+<title>PLAYER 01: ARIEF · Level 29</title>
+<meta name="description" content="Selamat datang di chapter baru kehidupanmu! Game RPG retro kecil yang dibuat khusus untuk ulang tahun Arief yang ke-29.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="PLAYER 01: ARIEF · Level 29">
+<meta property="og:description" content="Selamat datang di chapter baru kehidupanmu! Game RPG retro kecil yang dibuat khusus untuk ulang tahun Arief yang ke-29.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;family=Rubik:ital,wght@0,400;0,500;0,600;1,400&amp;family=VT323&amp;display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app"></div>
+<noscript><p style="color:#F7F4FF;font-family:sans-serif;padding:24px">Aktifkan JavaScript untuk memainkan PLAYER 01: ARIEF.</p></noscript>
+<template id="game-template">
+<div class="game" data-motion="{{motion}}">
+<div class="app {{viewCls}} {{todCls}}">
+  <div class="sky" aria-hidden="true">
+    <sc-for list="{{stars}}" as="s" hint-placeholder-count="12"><i class="star" style="left: {{s.x}}%; top: {{s.y}}%; width: {{s.z}}px; height: {{s.z}}px; animation-delay: {{s.d}}s"></i></sc-for>
+    <sc-for list="{{clouds}}" as="c" hint-placeholder-count="3"><img class="pix cloud" src="{{cloudImg}}" alt="" style="top: {{c.y}}%; width: {{c.w}}px; animation-duration: {{c.s}}s; animation-delay: {{c.d}}s"></sc-for>
+    <div class="sun"></div>
+    <div class="hills"></div>
+    <div class="ground"></div>
+  </div>
+
+  <header class="hud">
+    <div class="hud-id">
+      <p class="hud-logo">PLAYER 01: <span class="hl">ARIEF</span></p>
+      <p class="hud-lv">LV 29</p>
+    </div>
+    <div class="hud-prog">
+      <div class="hud-prog-top">
+        <p class="hud-stage">STAGE {{stageNum}} · {{stageName}} · {{todName}}</p>
+        <p class="hud-count">PROGRES MISI: <span class="hl">{{doneCount}}/10</span></p>
+      </div>
+      <div class="segs">
+        <sc-for list="{{segs}}" as="g" hint-placeholder-count="5">
+          <button class="seg {{g.cls}}" type="button" onClick="{{g.go}}" disabled="{{g.locked}}" aria-label="{{g.label}}" aria-current="{{g.current}}"><span class="seg-bar"><span class="seg-fill"></span></span></button>
+        </sc-for>
+      </div>
+    </div>
+    <div class="hud-actions">
+      <button class="icon-btn ach-btn" type="button" onClick="{{openAch}}" aria-label="Achievement, {{achCount}} dari 6 terbuka">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M4 1h8v1h3v4h-1v1h-2v1h-1v1H9v2h2v1h1v2H4v-2h1v-1h2V9H6V8H5V7H3V6H2V2h2V1zm-1 2v2h1V3H3zm9 0v2h1V3h-1z"></path></svg>
+        <span class="ach-count">{{achCount}}/6</span>
+      </button>
+      <button class="icon-btn" type="button" onClick="{{toggleSound}}" aria-label="{{soundLabel}}" aria-pressed="{{sound}}">
+        <sc-if value="{{sound}}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M1 6h3l3-3h2v10H7l-3-3H1V6zm10 0h1v4h-1V6zm2-2h1v1h1v6h-1v1h-1V4z"></path></svg></sc-if>
+        <sc-if value="{{soundOff}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M1 6h3l3-3h2v10H7l-3-3H1V6zm10-1h1v1h1V5h1v1h-1v1h-1v1h1v1h1v1h-1V9h-1v1h-1V9h1V8h-1V7h1V6h-1V5z"></path></svg></sc-if>
+      </button>
+      <button class="icon-btn" type="button" onClick="{{askRestart}}" aria-label="Ulangi quest dari awal">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M5 1h6v1h2v2h1v8h-1v2h-2v1H5v-1H3v-2H2V9h2v2h1v1h6v-1h1V5h-1V4H5v1H4v1h2v2H1V3h2v1h1V2h1V1z"></path></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage">
+
+    <sc-if value="{{isIntro}}" hint-placeholder-val="{{ true }}">
+    <section class="screen intro" aria-labelledby="t-intro">
+      <div class="screen-head">
+        <p class="kicker">STAGE 00 · PERKENALAN PEMAIN</p>
+        <h1 class="title" id="t-intro">SELAMAT DATANG, PLAYER 01!</h1>
+      </div>
+      <div class="intro-grid">
+        <div class="panel portrait-card">
+          <div class="portrait-frame">
+            <button class="avatar-btn" type="button" onClick="{{avatarTap}}" aria-label="Avatar Arief">
+              <img class="pix avatar-img {{heroAnimCls}}" key="{{avatarKey}}" src="{{avatarSrc}}" alt="Potret pixel-art Arief">
+            </button>
+            <sc-if value="{{noPhoto}}" hint-placeholder-val="{{ true }}">
+              <button class="photo-slot" type="button" onClick="{{openPhoto}}">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M5 2h6v2h3v10H2V4h3V2zm2 4v1H6v1H5v3h1v1h1v1h2v-1h1v-1h1V8h-1V7H9V6H7z"></path></svg>
+                <span>TAMBAH FOTO ARIEF</span>
+              </button>
+            </sc-if>
+            <sc-if value="{{hasPhoto}}" hint-placeholder-val="{{ false }}">
+              <button class="photo-edit" type="button" onClick="{{openPhoto}}" aria-label="Ganti foto Arief">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M5 2h6v2h3v10H2V4h3V2zm2 4v1H6v1H5v3h1v1h1v1h2v-1h1v-1h1V8h-1V7H9V6H7z"></path></svg>
+              </button>
+            </sc-if>
+          </div>
+          <p class="name-plate">ARIEF</p>
+          <p class="lvl-badge"><span class="spark">★</span> LEVEL 29 TERBUKA <span class="spark">★</span></p>
+        </div>
+
+        <div class="panel profile">
+          <h2 class="panel-title">PROFIL KARAKTER</h2>
+          <dl class="profile-list">
+            <div class="pl-row"><dt>NAMA</dt><dd>ARIEF</dd></div>
+            <div class="pl-row"><dt>LEVEL</dt><dd>29</dd></div>
+            <div class="pl-row"><dt>ROLE UTAMA</dt><dd>Backend Developer</dd></div>
+            <div class="pl-row"><dt>ROLE IMPIAN, TAPI NANTI DULU</dt><dd>Atlet Esports Pro</dd></div>
+            <div class="pl-row"><dt>KEMAMPUAN SPESIAL</dt><dd>Radar Jajanan</dd></div>
+          </dl>
+        </div>
+
+        <div class="panel attrs">
+          <h2 class="panel-title">ATRIBUT</h2>
+          <div class="attr-list">
+            <sc-for list="{{attrs}}" as="a" hint-placeholder-count="6">
+              <button class="attr {{a.cls}}" type="button" onClick="{{a.tap}}" aria-expanded="{{a.open}}">
+                <span class="attr-top"><span class="attr-name">{{a.name}}</span><span class="attr-val">{{a.text}}</span></span>
+                <span class="meter {{a.kind}}"><span class="meter-fill" style="width: {{a.w}}%"></span></span>
+              </button>
+            </sc-for>
+          </div>
+          <p class="attr-note" aria-live="polite">{{attrNote}}</p>
+          <p class="fine">Stat fiktif buat lucu-lucuan, bukan hasil pengukuran asli.</p>
+          <button class="egg egg-duck" type="button" onClick="{{bathEgg}}" aria-label="Bebek karet yang mencurigakan"><img class="pix" src="{{spr.duck}}" alt=""></button>
+        </div>
+        <div class="dialog">
+          <p class="dialog-who">SISTEM</p>
+          <div class="dialog-text">
+            <p class="dl">Halo, Arief!</p>
+            <p class="dl">Selamat datang di chapter baru kehidupanmu!</p>
+            <p class="dl">29 tahun sudah kamu lalui dengan segala cerita, perjuangan, dan mimpi.</p>
+            <p class="dl">Tahun ini, ada banyak hal baru yang menantimu.</p>
+            <p class="dl">So, get ready!</p>
+            <p class="dl dl-strong">It’s time to level up!</p>
+          </div>
+          <button class="btn btn-primary btn-start" type="button" onClick="{{startQuest}}">MULAI QUEST-MU →</button>
+        </div>
+      </div>
+
+      <button class="egg egg-food" type="button" onClick="{{foodEgg}}" aria-label="Ada bau enak nih"><img class="pix" src="{{spr.satay}}" alt=""></button>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{isQuiz}}" hint-placeholder-val="{{ false }}">
+    <section class="screen quiz" aria-labelledby="t-quiz">
+      <div class="screen-head">
+        <p class="kicker">STAGE 01 · QUIZ ULANG TAHUN</p>
+        <h1 class="title" id="t-quiz">SEBERAPA KENAL KAMU SAMA DIRIMU?</h1>
+        <p class="subtitle">Yuk cari tahu kepribadian ulang tahunmu yang sebenarnya.</p>
+      </div>
+      <sc-if value="{{quizAsking}}" hint-placeholder-val="{{ true }}">
+        <div class="panel qcard" key="{{qKey}}">
+          <div class="q-meta">
+            <p class="q-count">PERTANYAAN {{qNum}}/5</p>
+            <div class="q-dots" aria-hidden="true"><sc-for list="{{qDots}}" as="d" hint-placeholder-count="5"><i class="q-dot {{d.cls}}"></i></sc-for></div>
+          </div>
+          <h2 class="q-text">{{q.text}}</h2>
+          <div class="answers">
+            <sc-for list="{{qOpts}}" as="o" hint-placeholder-count="4">
+              <button class="answer {{o.cls}}" type="button" onClick="{{o.pick}}" disabled="{{quizLocked}}"><span class="answer-key">{{o.key}}</span><span class="answer-text">{{o.text}}</span></button>
+            </sc-for>
+          </div>
+          <div class="q-nav">
+            <sc-if value="{{canBack}}" hint-placeholder-val="{{ false }}"><button class="btn btn-ghost" type="button" onClick="{{quizBack}}">← SEBELUMNYA</button></sc-if>
+            <p class="fine">Nggak ada jawaban salah. Yang ada cuma jawaban jujur.</p>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{quizDone}}" hint-placeholder-val="{{ false }}">
+        <div class="result">
+          <div class="panel result-card">
+            <p class="kicker">KEPRIBADIAN ULANG TAHUNMU</p>
+            <div class="result-icon"><img class="pix" src="{{type.img}}" alt=""></div>
+            <h2 class="result-title">{{type.title}}</h2>
+            <p class="result-desc">“{{type.desc}}”</p>
+            <div class="rec"><p class="rec-label">REKOMENDASI</p><p class="rec-text">{{type.rec}}</p></div>
+          </div>
+          <div class="panel result-side">
+            <h2 class="panel-title">PEMINDAIAN KEPRIBADIAN</h2>
+            <div class="scan">
+              <sc-for list="{{scoreBars}}" as="r" hint-placeholder-count="5">
+                <div class="scan-row {{r.cls}}"><span class="scan-name">{{r.name}}</span><span class="meter m-bar"><span class="meter-fill" style="width: {{r.w}}%"></span></span><span class="scan-n">{{r.n}}</span></div>
+              </sc-for>
+            </div>
+            <p class="ach-line"><img class="pix" src="{{spr.star}}" alt=""> ACHIEVEMENT: KENAL DIRI SENDIRI!</p>
+            <div class="btn-row">
+              <button class="btn btn-primary" type="button" onClick="{{toBattle}}">KE BABAK BERIKUTNYA →</button>
+              <button class="btn btn-ghost" type="button" onClick="{{retake}}">ULANGI QUIZ</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{isGame}}" hint-placeholder-val="{{ false }}">
+    <section class="screen mg" aria-labelledby="t-mg">
+      <div class="screen-head">
+        <p class="kicker">STAGE {{stageNum}} · {{gameTimeLabel}}</p>
+        <h1 class="title" id="t-mg">{{mg.title}}</h1>
+        <p class="subtitle">{{mg.sub}}</p>
+      </div>
+
+      <sc-if value="{{mgStory}}" hint-placeholder-val="{{ true }}">
+        <div class="panel mg-story">
+          <div class="story-art"><span class="clock-chip">{{mg.clock}}</span><img class="pix" src="{{mg.img}}" alt=""></div>
+          <div class="story-body">
+            <p class="story-text">{{mg.text}}</p>
+            <ul class="rules"><sc-for list="{{mg.rules}}" as="r" hint-placeholder-count="3"><li>{{r.t}}</li></sc-for></ul>
+            <div class="loot"><img class="pix" src="{{mg.itemImg}}" alt=""><div><p class="loot-k">HADIAH ITEM</p><p class="loot-t">{{mg.itemName}}</p><p class="loot-d">{{mg.itemFx}}</p></div></div>
+            <button class="btn btn-primary" type="button" onClick="{{startGame}}">MULAI!</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{mgPlay}}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{isRush}}" hint-placeholder-val="{{ false }}">
+          <div class="panel mg-play rush">
+            <div class="rush-top">
+              <div class="clock {{rush.clockCls}}" aria-live="polite"><span class="clock-l">JAM</span>{{rush.clock}}</div>
+              <p class="rush-dl">Batas berangkat <b>07.30</b></p>
+            </div>
+            <div class="rush-grid">
+              <ol class="checklist">
+                <sc-for list="{{rush.list}}" as="c" hint-placeholder-count="5"><li class="ck {{c.cls}}"><img class="pix" src="{{c.img}}" alt=""><span>{{c.name}}</span></li></sc-for>
+              </ol>
+              <div class="tasks">
+                <sc-for list="{{rush.tasks}}" as="t" hint-placeholder-count="5"><button class="task {{t.cls}}" type="button" onClick="{{t.tap}}" disabled="{{t.off}}"><img class="pix" src="{{t.img}}" alt=""><span>{{t.name}}</span></button></sc-for>
+              </div>
+            </div>
+            <sc-if value="{{mgMsgOn}}" hint-placeholder-val="{{ false }}"><p class="mg-msg" key="{{mgMsgKey}}" aria-live="polite">{{mgMsg}}</p></sc-if>
+            <sc-if value="{{rush.tempt}}" hint-placeholder-val="{{ false }}">
+              <div class="tempt" key="{{rush.temptKey}}" role="alertdialog" aria-label="Godaan">
+                <img class="pix" src="{{rush.temptImg}}" alt="">
+                <p class="tempt-k">GODAAN MUNCUL!</p>
+                <p class="tempt-t">{{rush.temptText}}</p>
+                <div class="btn-row"><button class="btn btn-ghost" type="button" onClick="{{rushYes}}">{{rush.yesLabel}}</button><button class="btn btn-primary" type="button" onClick="{{rushNo}}">NANTI AJA</button></div>
+                <span class="tempt-bar"></span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isMemory}}" hint-placeholder-val="{{ false }}">
+          <div class="panel mg-play mem">
+            <div class="mg-hud"><p>LANGKAH <span class="hl">{{mem.moves}}</span></p><p>PASANGAN <span class="hl">{{mem.pairs}}/8</span></p></div>
+            <div class="mem-grid">
+              <sc-for list="{{mem.cards}}" as="c" hint-placeholder-count="16">
+                <button class="mcard {{c.cls}}" type="button" onClick="{{c.tap}}" aria-label="{{c.label}}"><span class="mc-back" aria-hidden="true">?</span><span class="mc-front"><img class="pix" src="{{c.img}}" alt=""><span class="mc-name">{{c.name}}</span></span></button>
+              </sc-for>
+            </div>
+            <sc-if value="{{mgMsgOn}}" hint-placeholder-val="{{ false }}"><p class="mg-msg" key="{{mgMsgKey}}" aria-live="polite">{{mgMsg}}</p></sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isBugs}}" hint-placeholder-val="{{ false }}">
+          <div class="panel mg-play bugs">
+            <div class="mg-hud"><p>SKOR <span class="hl">{{bugs.score}}</span></p><span class="timebar"><span class="timefill" style="width: {{bugs.pct}}%"></span></span><p>{{bugs.sec}}s</p></div>
+            <div class="holes">
+              <sc-for list="{{bugs.holes}}" as="h" hint-placeholder-count="9">
+                <button class="hole {{h.cls}}" type="button" onClick="{{h.tap}}" aria-label="{{h.label}}"><span class="hole-pit" aria-hidden="true"></span><sc-if value="{{h.show}}" hint-placeholder-val="{{ false }}"><span class="hole-pop" key="{{h.k}}"><img class="pix" src="{{h.img}}" alt=""><sc-if value="{{h.notif}}" hint-placeholder-val="{{ false }}"><span class="notif-tag">PUSH RANK?</span></sc-if></span></sc-if></button>
+              </sc-for>
+            </div>
+            <sc-if value="{{mgMsgOn}}" hint-placeholder-val="{{ false }}"><p class="mg-msg" key="{{mgMsgKey}}" aria-live="polite">{{mgMsg}}</p></sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isFood}}" hint-placeholder-val="{{ false }}">
+          <div class="panel mg-play food">
+            <div class="mg-hud"><p>JAJANAN <span class="hl">{{food.score}}</span></p><span class="timebar"><span class="timefill" style="width: {{food.pct}}%"></span></span><p>{{food.sec}}s</p></div>
+            <div class="road" onPointerDown="{{foodPoint}}" onPointerMove="{{foodPoint}}" aria-label="Jalan. Geser untuk mengarahkan motor">
+              <span class="road-line" aria-hidden="true"></span>
+              <sc-for list="{{food.items}}" as="f" hint-placeholder-count="3"><img class="pix fall {{f.cls}}" src="{{f.img}}" alt="" style="left: {{f.x}}%; top: {{f.y}}%"></sc-for>
+              <img class="pix rider" src="{{rider}}" alt="Arief naik motor" style="left: {{food.x}}%">
+              <sc-if value="{{food.pop}}" hint-placeholder-val="{{ false }}"><span class="food-pop {{food.popCls}}" key="{{food.popKey}}" style="left: {{food.x}}%">{{food.popText}}</span></sc-if>
+            </div>
+            <div class="road-ctl"><button class="btn btn-ghost" type="button" onClick="{{foodLeft}}" aria-label="Ke kiri">◀</button><button class="btn btn-ghost" type="button" onClick="{{foodRight}}" aria-label="Ke kanan">▶</button></div>
+          </div>
+        </sc-if>
+      </sc-if>
+
+      <sc-if value="{{mgDone}}" hint-placeholder-val="{{ false }}">
+        <div class="panel mg-done">
+          <p class="kicker">HASIL</p>
+          <p class="done-stars" aria-label="Rating">{{mg.stars}}</p>
+          <h2 class="done-title">{{mg.rating}}</h2>
+          <p class="done-sum">{{mg.summary}}</p>
+          <div class="loot is-got"><img class="pix" src="{{mg.itemImg}}" alt=""><div><p class="loot-k">ITEM DIDAPAT · MASUK TAS</p><p class="loot-t">{{mg.itemName}}</p><p class="loot-d">{{mg.itemFx}} saat battle melawan ADULTING</p></div></div>
+          <p class="fine">{{mg.improved}}</p>
+          <div class="btn-row"><button class="btn btn-primary" type="button" onClick="{{toNext}}">KE BABAK BERIKUTNYA →</button><button class="btn btn-ghost" type="button" onClick="{{replayGame}}">MAIN LAGI</button></div>
+        </div>
+      </sc-if>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{isBattle}}" hint-placeholder-val="{{ false }}">
+    <section class="screen battle" aria-labelledby="t-battle">
+      <div class="screen-head">
+        <p class="kicker">STAGE 06 · 21.00 · MALAM</p>
+        <h1 class="title" id="t-battle">ROAD TO MYTHIC: BATTLE ULANG TAHUN</h1>
+        <p class="subtitle">Buktikan kalau kamu layak jadi pemain legendaris.</p>
+      </div>
+      <div class="items-strip">
+        <p class="items-k">ITEM AKTIF DARI PERJALANAN HARI INI</p>
+        <div class="items-row">
+          <sc-for list="{{bag}}" as="it" hint-placeholder-count="4"><div class="item-chip {{it.cls}}"><img class="pix" src="{{it.img}}" alt=""><span><b>{{it.name}}</b><br>{{it.fx}}</span></div></sc-for>
+        </div>
+      </div>
+      <div class="battle-grid">
+        <div class="panel fighter f-player">
+          <button class="f-avatar" type="button" onClick="{{avatarTap}}" aria-label="Avatar Arief"><img class="pix" src="{{avatarSrc}}" alt="Arief"></button>
+          <div class="f-info">
+            <p class="f-name">ARIEF</p>
+            <p class="f-sub">LV 29 · Backend Developer</p>
+            <div class="hp"><span class="hp-label">HP</span><span class="hpbar"><span class="hpfill hp-player {{b.pCls}}" style="width: {{b.pPct}}%"></span></span><span class="hp-num">{{b.php}}/{{b.maxHp}}</span></div>
+          </div>
+        </div>
+
+        <div class="arena {{arenaCls}}" key="{{arenaKey}}">
+          <p class="turn-flag {{turnCls}}" aria-live="polite">{{turnText}}</p>
+          <div class="papers" aria-hidden="true"><i class="paper p1"></i><i class="paper p2"></i><i class="paper p3"></i></div>
+          <div class="unit u-hero"><img class="pix hero-spr {{heroAnimCls}}" key="{{heroKey}}" src="{{spr.hero}}" alt="Arief, hero pixel dengan pedang kode"></div>
+          <div class="unit u-boss"><img class="pix boss-spr {{bossAnimCls}}" key="{{bossKey}}" src="{{spr.boss}}" alt="ADULTING, monster ungu bermata jam yang pakai dasi"></div>
+          <div class="floor" aria-hidden="true"></div>
+          <sc-if value="{{fxShow}}" hint-placeholder-val="{{ false }}"><span class="fx {{fx.on}} fx-{{fx.kind}}" key="{{fxKey}}" aria-hidden="true">{{fx.t}}</span></sc-if>
+        </div>
+
+        <div class="panel fighter f-boss">
+          <div class="f-info">
+            <p class="f-name">FINAL BOSS: ADULTING</p>
+            <p class="f-sub">LV 99 · Deadline, tagihan, dan tanggung jawab</p>
+            <div class="hp"><span class="hp-label">HP</span><span class="hpbar"><span class="hpfill hp-boss {{b.bCls}}" style="width: {{b.bPct}}%"></span></span><span class="hp-num">{{b.bhp}}/100</span></div>
+          </div>
+        </div>
+
+        <div class="command">
+          <div class="panel battle-log" aria-live="polite">
+            <sc-for list="{{battleLog}}" as="l" hint-placeholder-count="3"><p class="log-line {{l.cls}}" key="{{l.k}}">{{l.t}}</p></sc-for>
+          </div>
+          <div class="skills">
+            <sc-for list="{{skills}}" as="k" hint-placeholder-count="3">
+              <button class="skill {{k.cls}}" type="button" onClick="{{k.use}}" disabled="{{k.off}}">
+                <img class="pix skill-icon" src="{{k.img}}" alt="">
+                <span class="skill-name">{{k.name}}</span>
+                <span class="skill-meta">{{k.meta}}</span>
+                <span class="skill-short">{{k.short}}</span>
+                <span class="skill-key" aria-hidden="true">{{k.hot}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <sc-if value="{{victory}}" hint-placeholder-val="{{ false }}">
+        <div class="victory" role="dialog" aria-modal="false" aria-labelledby="t-victory">
+          <div class="panel victory-card">
+            <p class="v-flash" id="t-victory">VICTORY!</p>
+            <p class="v-sub">KAMU MENGALAHKAN BOSS!</p>
+            <p class="v-quote">“Mimpimu bukan side quest. Terus grinding, Arief!”</p>
+            <div class="v-rewards">
+              <p class="v-xp">XP <span class="hl">+500</span></p>
+              <p class="v-ach"><img class="pix" src="{{spr.star}}" alt=""> FIRST BLOOD TERBUKA</p>
+            </div>
+            <button class="btn btn-primary" type="button" onClick="{{toProphecy}}">KE BABAK BERIKUTNYA →</button>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{lost}}" hint-placeholder-val="{{ false }}">
+        <div class="victory">
+          <div class="panel victory-card">
+            <p class="v-flash">K.O.? HARI INI NGGAK.</p>
+            <p class="v-quote">Legenda selalu respawn. Adulting memang berat, tapi kamu lebih kuat.</p>
+            <button class="btn btn-primary" type="button" onClick="{{respawn}}">RESPAWN →</button>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{isProph}}" hint-placeholder-val="{{ false }}">
+    <section class="screen prophecy" aria-labelledby="t-proph">
+      <div class="screen-head">
+        <p class="kicker">STAGE 07 · 23.30 · TENGAH MALAM</p>
+        <h1 class="title" id="t-proph">MESIN RAMALAN</h1>
+        <p class="subtitle">Babak berikutnya sudah menunggu.</p>
+      </div>
+      <div class="proph-grid">
+        <div class="panel machine">
+          <div class="ball-wrap {{spinCls}}"><span class="ball-glow"></span><img class="pix ball" src="{{spr.crystal}}" alt="Bola kristal pixel yang bersinar"></div>
+          <p class="machine-status" aria-live="polite">{{machineStatus}}</p>
+          <button class="btn btn-primary" type="button" onClick="{{reveal}}" disabled="{{spinning}}">{{revealLabel}}</button>
+          <p class="fine">Cuma ramalan iseng, bukan jaminan. Hasilnya tergantung usaha, istirahat, dan seberapa sering ngemil.</p>
+        </div>
+        <div class="proph-side">
+          <div class="panel tracker">
+            <h2 class="panel-title">KATEGORI TERBUKA <span class="hl">{{revCount}}/6</span></h2>
+            <div class="cats">
+              <sc-for list="{{cats}}" as="c" hint-placeholder-count="6">
+                <div class="cat {{c.cls}}"><img class="pix" src="{{c.img}}" alt=""><span class="cat-name">{{c.name}}</span><span class="sr-only">{{c.state}}</span></div>
+              </sc-for>
+            </div>
+          </div>
+          <sc-if value="{{hasCard}}" hint-placeholder-val="{{ false }}">
+            <div class="pcard" key="{{cardKey}}">
+              <p class="pcard-cat"><img class="pix" src="{{card.img}}" alt=""> {{card.cat}}</p>
+              <p class="pcard-text">“{{card.text}}”</p>
+            </div>
+          </sc-if>
+          <sc-if value="{{noCard}}" hint-placeholder-val="{{ true }}">
+            <div class="pcard is-empty"><p class="pcard-text">Bola kristal sedang menunggu pertanyaan pertamamu…</p></div>
+          </sc-if>
+          <sc-if value="{{prophDone}}" hint-placeholder-val="{{ false }}">
+            <div class="unlock-row">
+              <p class="ach-line"><img class="pix" src="{{spr.star}}" alt=""> MASA DEPAN CERAH!</p>
+              <button class="btn btn-primary" type="button" onClick="{{toAward}}">BUKA HADIAH TERAKHIRKU →</button>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{isAward}}" hint-placeholder-val="{{ false }}">
+    <section class="screen award" aria-labelledby="t-award">
+      <div class="screen-head">
+        <p class="kicker">STAGE 08 · PENGHARGAAN ULANG TAHUN</p>
+        <h1 class="title" id="t-award">ARIEF SANG LEGENDA</h1>
+        <p class="subtitle">Selamat, kamu sudah menyelesaikan quest ulang tahunmu!</p>
+      </div>
+      <div class="award-grid">
+        <div class="cert">
+          <div class="cert-inner">
+            <img class="pix cert-trophy" src="{{spr.trophy}}" alt="Piala pixel emas">
+            <p class="cert-k">SERTIFIKAT</p>
+            <p class="cert-t">PENCAPAIAN LEGENDARIS</p>
+            <div class="cert-who">
+              <img class="pix cert-avatar" src="{{avatarSrc}}" alt="Arief">
+              <div><p class="cert-name">ARIEF</p><p class="cert-lv">LEVEL ULANG TAHUN 29</p></div>
+            </div>
+            <dl class="cert-rows">
+              <div class="cr"><dt>KEPRIBADIAN</dt><dd>{{certType}}</dd></div>
+              <sc-for list="{{certGames}}" as="cg" hint-placeholder-count="4"><div class="cr"><dt>{{cg.k}}</dt><dd>{{cg.v}}</dd></div></sc-for>
+              <div class="cr"><dt>HASIL BATTLE</dt><dd>{{certBattle}}</dd></div>
+              <div class="cr"><dt>GELAR SPESIAL</dt><dd>Calon Legenda Esports</dd></div>
+            </dl>
+            <div class="cert-award">
+              <p class="ca-k">PENGHARGAAN SPESIAL</p>
+              <p class="ca-t">PALING MUNGKIN JADI PRO PLAYER</p>
+              <p class="ca-q">“Terus grinding, Arief. Mimpimu bukan side quest.”</p>
+              <p class="ca-n">*Syarat &amp; ketentuan: latihan konsisten, istirahat cukup, dan kurangi menunda.</p>
+            </div>
+            <div class="cert-badges">
+              <sc-for list="{{badges}}" as="g" hint-placeholder-count="4"><span class="cb"><img class="pix" src="{{g.img}}" alt=""><span class="cb-t">{{g.title}}</span></span></sc-for>
+            </div>
+          </div>
+        </div>
+        <div class="panel award-side">
+          <h2 class="panel-title">HADIAH QUEST</h2>
+          <div class="rewards">
+            <p class="rw"><span>TOTAL XP</span><span class="hl">{{xp}}</span></p>
+            <p class="rw"><span>ACHIEVEMENT</span><span class="hl">{{achCount}}/6</span></p>
+            <p class="rw"><span>LEVEL</span><span class="hl">29</span></p>
+          </div>
+          <button class="btn btn-primary" type="button" onClick="{{downloadCert}}" disabled="{{certBusy}}">{{certLabel}}</button>
+          <sc-if value="{{certDone}}" hint-placeholder-val="{{ false }}">
+            <p class="saved-msg">Pencapaianmu sudah tersimpan. Simpan sertifikat ini sebagai bukti kamu berhasil bertahan setahun lagi!</p>
+            <button class="btn btn-pink" type="button" onClick="{{toLetter}}">KLAIM HADIAH TERAKHIRMU →</button>
+          </sc-if>
+        </div>
+      </div>
+    </section>
+    </sc-if>
+
+    <sc-if value="{{isLetter}}" hint-placeholder-val="{{ false }}">
+    <section class="screen letter" aria-labelledby="t-letter">
+      <sc-if value="{{letterIntro}}" hint-placeholder-val="{{ true }}">
+        <div class="sysmsg">
+          <p class="sm sm1">PESAN SISTEM: SEMUA MISI SELESAI.</p>
+          <p class="sm sm2">Player Arief berhasil membuka Level 29.</p>
+          <p class="sm sm3">Tapi, masih ada satu pesan terakhir yang menunggumu…</p>
+          <img class="pix envelope" src="{{spr.envelope}}" alt="Amplop kecil bersegel hati">
+          <button class="btn btn-pink sm4" type="button" onClick="{{openLetter}}" id="t-letter">BUKA HADIAH TERAKHIRMU</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{letterOpen}}" hint-placeholder-val="{{ false }}">
+        <div class="letter-wrap">
+          <article class="letter-card">
+            <img class="pix letter-env" src="{{spr.envelope}}" alt="">
+            <h1 class="letter-title" id="t-letter">SURAT UNTUK ARIEF 💌</h1>
+            <sc-for list="{{lines}}" as="l" hint-placeholder-count="6"><p class="lp {{l.cls}}" style="animation-delay: {{l.d}}s">{{l.t}}</p></sc-for>
+            <p class="lp l-sign" style="animation-delay: 3.6s">Dibuat dengan cinta, khusus untukmu.</p>
+          </article>
+          <button class="btn btn-pink btn-prize" type="button" onClick="{{toPrize}}">AMBIL HADIAH UTAMA →</button>
+          <div class="letter-actions">
+            <button class="btn btn-ghost" type="button" onClick="{{openAch}}">LIHAT ACHIEVEMENT</button>
+            <button class="btn btn-ghost" type="button" onClick="{{toCert}}">KEMBALI KE SERTIFIKAT</button>
+          </div>
+        </div>
+      </sc-if>
+    </section>
+    </sc-if>
+    <sc-if value="{{isPrize}}" hint-placeholder-val="{{ false }}">
+    <section class="screen prize" aria-labelledby="t-prize">
+      <div class="screen-head">
+        <p class="kicker">BONUS · 00.00 · HARI ULANG TAHUNMU</p>
+        <h1 class="title" id="t-prize">HADIAH UTAMA</h1>
+        <sc-if value="{{pzFresh}}" hint-placeholder-val="{{ true }}"><p class="subtitle">Pilih satu hadiah. Apa pun yang kamu pilih, langsung jadi milikmu!</p></sc-if>
+        <sc-if value="{{pzDone}}" hint-placeholder-val="{{ false }}"><p class="subtitle">Hadiah sudah diklaim. Semua hadiah lain sedang diproses… sampai tahun 2099.</p></sc-if>
+      </div>
+
+      <sc-if value="{{pzPick}}" hint-placeholder-val="{{ true }}">
+        <div class="pz-grid">
+          <sc-for list="{{prizeCards}}" as="p" hint-placeholder-count="15">
+            <button class="pz-card {{p.cls}}" type="button" onClick="{{p.tap}}" aria-label="{{p.label}}">
+              <img class="pix pz-gift" src="{{giftImg}}" alt="">
+              <span class="pz-name">{{p.name}}</span>
+              <sc-if value="{{p.stamp}}" hint-placeholder-val="{{ false }}"><span class="pz-stamp">TIDAK TERSEDIA</span></sc-if>
+            </button>
+          </sc-for>
+        </div>
+        <sc-if value="{{mgMsgOn}}" hint-placeholder-val="{{ false }}"><p class="mg-msg pz-msg" key="{{mgMsgKey}}" aria-live="polite">{{mgMsg}}</p></sc-if>
+        <sc-if value="{{pzDone}}" hint-placeholder-val="{{ false }}"><div class="pz-back"><button class="btn btn-pink" type="button" onClick="{{prizeReveal}}">LIHAT HADIAHKU LAGI</button></div></sc-if>
+      </sc-if>
+
+      <sc-if value="{{pzProc}}" hint-placeholder-val="{{ false }}">
+        <div class="panel term pz-proc" aria-live="polite">
+          <p class="term-l">&gt; Memproses hadiah: <b>{{pzName}}</b>…</p>
+          <sc-if value="{{pzS1}}" hint-placeholder-val="{{ false }}"><p class="term-l err pz-err">&gt; ⚠ ERROR: {{pzErr}}</p></sc-if>
+          <sc-if value="{{pzS2}}" hint-placeholder-val="{{ false }}"><p class="term-l">&gt; Mengganti dengan hadiah yang lebih realistis…</p></sc-if>
+          <sc-if value="{{pzS3}}" hint-placeholder-val="{{ false }}">
+            <p class="term-l">&gt; Mengacak ulang hadiah…</p>
+            <p class="rarity {{rarCls}}" key="{{rarKey}}">{{rarName}}</p>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{pzReveal}}" hint-placeholder-val="{{ false }}">
+        <div class="pz-reveal">
+          <div class="panel pz-card-big">
+            <p class="legend-k">✦ LEGENDARY DROP ✦</p>
+            <div class="pb-stage"><span class="rays" aria-hidden="true"></span><img class="pix pb-img" src="{{pbImg}}" alt="Power bank Anker hitam dengan layar LED dan kabel USB-C"></div>
+            <h2 class="pb-name">POWER BANK ANKER</h2>
+            <p class="pb-spec">Zolo · 10.000 mAh · 22.5W · kabel USB-C bawaan</p>
+            <p class="pb-msg">Karena HP kamu hobinya lowbat, sekarang kamu punya cadangan energi ke mana pun kamu pergi. Nggak ada alasan lagi susah dihubungi 😉</p>
+          </div>
+          <div class="claim">
+            <p class="claim-k">KLAIM HADIAH</p>
+            <p class="claim-t">Hadiah aslinya sudah menunggumu. Tunjukkan layar ini ke aku untuk mengambilnya 😉</p>
+          </div>
+          <div class="btn-row"><button class="btn btn-ghost" type="button" onClick="{{prizeGrid}}">COBA PILIH HADIAH LAIN</button><button class="btn btn-ghost" type="button" onClick="{{openAch}}">LIHAT TAS</button></div>
+        </div>
+      </sc-if>
+    </section>
+    </sc-if>
+
+  </main>
+
+  <sc-if value="{{wipeOn}}" hint-placeholder-val="{{ false }}"><div class="wipe" key="{{wipeKey}}" aria-hidden="true"></div></sc-if>
+
+  <sc-if value="{{bannerOn}}" hint-placeholder-val="{{ false }}">
+    <div class="banner" key="{{bannerKey}}" role="status"><p class="banner-k">{{bannerK}}</p><p class="banner-t">{{banner}}</p></div>
+  </sc-if>
+  <sc-if value="{{confettiOn}}" hint-placeholder-val="{{ false }}">
+    <div class="confetti" key="{{confKey}}" aria-hidden="true"><sc-for list="{{bits}}" as="c" hint-placeholder-count="8"><i class="bit" style="left: {{c.x}}%; background: {{c.c}}; width: {{c.z}}px; height: {{c.z}}px; animation-delay: {{c.d}}s; transform: rotate({{c.r}}deg)"></i></sc-for></div>
+  </sc-if>
+
+  <sc-if value="{{toastOn}}" hint-placeholder-val="{{ false }}">
+    <div class="toast" key="{{toastKey}}" role="status"><img class="pix" src="{{toast.img}}" alt=""><div><p class="toast-k">ACHIEVEMENT TERBUKA</p><p class="toast-t">{{toast.title}}</p></div></div>
+  </sc-if>
+
+  <sc-if value="{{modalOn}}" hint-placeholder-val="{{ false }}">
+    <div class="modal-layer">
+      <button class="modal-scrim" type="button" onClick="{{closeModal}}" aria-label="Tutup" tabindex="-1"></button>
+
+      <sc-if value="{{mAch}}" hint-placeholder-val="{{ false }}">
+        <div class="modal panel" role="dialog" aria-modal="true" aria-labelledby="m-ach">
+          <div class="modal-head"><h2 class="panel-title" id="m-ach">TAS &amp; ACHIEVEMENT <span class="hl">{{achCount}}/6</span></h2><button class="icon-btn" type="button" onClick="{{closeModal}}" aria-label="Tutup"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 2h3v1h1v1h1v1h2V4h1V3h1V2h3v3h-1v1h-1v1h-1v2h1v1h1v1h1v3h-3v-1h-1v-1H9v-1H7v1H6v1H5v1H2v-3h1v-1h1V9h1V7H4V6H3V5H2V2z"></path></svg></button></div>
+          <p class="bag-k">TAS ITEM</p>
+          <div class="bag-grid">
+            <sc-for list="{{bag}}" as="it" hint-placeholder-count="4"><div class="item-chip {{it.cls}}"><img class="pix" src="{{it.img}}" alt=""><span><b>{{it.name}}</b> <span class="stars">{{it.stars}}</span><br>{{it.fx}}</span></div></sc-for>
+          </div>
+          <p class="bag-k">ACHIEVEMENT</p>
+          <div class="ach-grid">
+            <sc-for list="{{achList}}" as="a" hint-placeholder-count="6">
+              <div class="ach {{a.cls}}"><img class="pix" src="{{a.img}}" alt=""><div><p class="ach-t">{{a.title}}</p><p class="ach-d">{{a.desc}}</p><p class="ach-s">{{a.status}}</p></div></div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{mRestart}}" hint-placeholder-val="{{ false }}">
+        <div class="modal panel modal-sm" role="alertdialog" aria-modal="true" aria-labelledby="m-rs">
+          <h2 class="panel-title" id="m-rs">ULANGI QUEST DARI AWAL?</h2>
+          <p class="modal-text">Semua progres, hasil quiz, hasil battle, dan achievement di perangkat ini akan dihapus. Tenang, Arief tetap level 29.</p>
+          <div class="btn-row"><button class="btn btn-ghost" type="button" onClick="{{closeModal}}">BATAL</button><button class="btn btn-danger" type="button" onClick="{{doRestart}}">YA, ULANGI</button></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{mDev}}" hint-placeholder-val="{{ false }}">
+        <div class="modal panel modal-sm term" role="dialog" aria-modal="true" aria-labelledby="m-dev">
+          <img class="pix egg-art" src="{{spr.terminal}}" alt="">
+          <p class="term-l" id="m-dev">&gt; MODE DEVELOPER AKTIF.</p>
+          <p class="term-l">&gt; Selamat datang di backend. Tolong jangan rusak production.</p>
+          <p class="term-l dim">&gt; git commit -m "level up: 28 → 29"</p>
+          <button class="btn btn-primary" type="button" onClick="{{closeModal}}">KELUAR TERMINAL</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{mBath}}" hint-placeholder-val="{{ false }}">
+        <div class="modal panel modal-sm term" role="dialog" aria-modal="true" aria-labelledby="m-bath">
+          <img class="pix egg-art" src="{{spr.duck}}" alt="">
+          <p class="term-l err" id="m-bath">404: JADWAL MANDI TIDAK DITEMUKAN.</p>
+          <p class="term-l">Administrator sistem sudah diberi tahu.</p>
+          <button class="btn btn-primary" type="button" onClick="{{closeModal}}">IYA, IYA…</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{mFood}}" hint-placeholder-val="{{ false }}">
+        <div class="modal panel modal-sm" role="dialog" aria-modal="true" aria-labelledby="m-food">
+          <img class="pix egg-art radar" src="{{spr.satay}}" alt="">
+          <p class="egg-t" id="m-food">JAJANAN TERDETEKSI.</p>
+          <p class="modal-text">Level lapar Arief meningkat.</p>
+          <button class="btn btn-primary" type="button" onClick="{{closeModal}}">MINGGIR DULU</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{mMot}}" hint-placeholder-val="{{ false }}">
+        <div class="modal panel modal-sm term" role="dialog" aria-modal="true" aria-labelledby="m-mot">
+          <h2 class="panel-title" id="m-mot">DIAGNOSIS SISTEM</h2>
+          <div class="mot">
+            <sc-for list="{{mot}}" as="m" hint-placeholder-count="4"><p class="term-l {{m.cls}}">&gt; {{m.t}}</p></sc-for>
+          </div>
+          <span class="meter m-bar"><span class="meter-fill" style="width: {{motPct}}%"></span></span>
+          <sc-if value="{{motDone}}" hint-placeholder-val="{{ false }}"><button class="btn btn-primary" type="button" onClick="{{closeModal}}">GAS!</button></sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{mCert}}" hint-placeholder-val="{{ false }}">
+        <div class="modal panel" role="dialog" aria-modal="true" aria-labelledby="m-cert">
+          <div class="modal-head"><h2 class="panel-title" id="m-cert">SERTIFIKAT SIAP</h2><button class="icon-btn" type="button" onClick="{{closeModal}}" aria-label="Tutup"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 2h3v1h1v1h1v1h2V4h1V3h1V2h3v3h-1v1h-1v1h-1v2h1v1h1v1h1v3h-3v-1h-1v-1H9v-1H7v1H6v1H5v1H2v-3h1v-1h1V9h1V7H4V6H3V5H2V2z"></path></svg></button></div>
+          <p class="modal-text">File PNG sudah diunduh. Kalau browser belum menyimpannya, tekan lama (HP) atau klik kanan (komputer) gambar di bawah, lalu pilih Simpan.</p>
+          <img class="cert-preview" src="{{certUrl}}" alt="Sertifikat ulang tahun Arief">
+          <a class="btn btn-primary" href="{{certUrl}}" download="Arief-Level-29-Birthday-Certificate.png">SIMPAN PNG</a>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{mPhoto}}" hint-placeholder-val="{{ false }}">
+        <div class="modal panel" role="dialog" aria-modal="true" aria-labelledby="m-photo">
+          <div class="modal-head"><h2 class="panel-title" id="m-photo">FOTO ARIEF</h2><button class="icon-btn" type="button" onClick="{{closeModal}}" aria-label="Tutup"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M2 2h3v1h1v1h1v1h2V4h1V3h1V2h3v3h-1v1h-1v1h-1v2h1v1h1v1h1v3h-3v-1h-1v-1H9v-1H7v1H6v1H5v1H2v-3h1v-1h1V9h1V7H4V6H3V5H2V2z"></path></svg></button></div>
+          <div class="photo-grid">
+            <div class="photo-prev"><img class="pix" src="{{photoPreview}}" alt="Pratinjau avatar yang sudah di-pixelate"></div>
+            <div class="photo-ctl">
+              <p class="modal-text">Pilih foto Arief. Foto akan di-crop di sekitar orang yang ada di sebelah <b>kiri</b>, lalu di-pixelate. Atur sampai yang terlihat hanya kepala dan bahu Arief.</p>
+              <label class="btn btn-ghost file-btn">PILIH FOTO<input class="sr-only" type="file" accept="image/*" onChange="{{onPhotoFile}}"></label>
+              <sc-if value="{{photoLoaded}}" hint-placeholder-val="{{ false }}">
+                <label class="rng"><span>ZOOM <b>{{cropZTxt}}</b></span><input type="range" min="1" max="3" step="0.05" value="{{cropZ}}" onChange="{{onZoom}}"></label>
+                <label class="rng"><span>KIRI ↔ KANAN</span><input type="range" min="0" max="1" step="0.01" value="{{cropX}}" onChange="{{onCropX}}"></label>
+                <label class="rng"><span>ATAS ↕ BAWAH</span><input type="range" min="0" max="1" step="0.01" value="{{cropY}}" onChange="{{onCropY}}"></label>
+                <label class="rng"><span>UKURAN PIXEL <b>{{cropNTxt}}</b></span><input type="range" min="24" max="96" step="8" value="{{cropN}}" onChange="{{onCropN}}"></label>
+              </sc-if>
+              <sc-if value="{{hasPhotoErr}}" hint-placeholder-val="{{ false }}"><p class="err-text">{{photoErr}}</p></sc-if>
+              <div class="btn-row"><button class="btn btn-primary" type="button" onClick="{{savePhoto}}">PAKAI AVATAR INI</button><button class="btn btn-ghost" type="button" onClick="{{clearPhoto}}">PAKAI SPRITE PIXEL</button></div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+</div>
+</div>
+</template>
+<script src="mini-dc.js"></script>
+<script src="config.js"></script>
+<script src="script.js"></script>
+<script>MiniDC.mount(Component, document.getElementById('app'), document.getElementById('game-template'), window.ARIEF_CONFIG || {});</script>
+</body>
+</html>
